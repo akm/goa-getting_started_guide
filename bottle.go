@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/goadesign/goa"
 	"goa-getting_started_guide/app"
 )
@@ -17,11 +19,18 @@ func NewBottleController(service *goa.Service) *BottleController {
 
 // Show runs the show action.
 func (c *BottleController) Show(ctx *app.ShowBottleContext) error {
-	// BottleController_Show: start_implement
+	if ctx.BottleID == 0 {
+		// Emulate a missing record with ID 0
+		return ctx.NotFound()
+	}
+	// Build the resource using the generated data structure
+	bottle := app.GoaExampleBottle{
+		ID:   ctx.BottleID,
+		Name: fmt.Sprintf("Bottle #%d", ctx.BottleID),
+		Href: app.BottleHref(ctx.BottleID),
+	}
 
-	// Put your logic here
-
-	res := &app.GoaExampleBottle{}
-	return ctx.OK(res)
-	// BottleController_Show: end_implement
+	// Let the generated code produce the HTTP response using the
+	// media type described in the design (BottleMedia).
+	return ctx.OK(&bottle)
 }
